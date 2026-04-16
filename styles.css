@@ -1,0 +1,14 @@
+.stock-card-suggestion {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stock-card-suggestion-title {
+  font-weight: 600;
+}
+
+.stock-card-suggestion-meta {
+  color: var(--text-muted);
+  font-size: 0.85em;
+}

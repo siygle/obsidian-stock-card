@@ -1,0 +1,10 @@
+{
+  "id": "stock-info-card",
+  "name": "Stock Info Card",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Search stocks and insert rich stock information cards into Obsidian notes.",
+  "author": "Shih-Yung Lee",
+  "authorUrl": "https://github.com/siygle",
+  "isDesktopOnly": false
+}

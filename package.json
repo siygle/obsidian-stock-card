@@ -1,0 +1,26 @@
+{
+  "name": "obsidian-stock-card",
+  "version": "0.1.0",
+  "description": "Obsidian plugin to search stocks and insert stock information cards.",
+  "main": "main.js",
+  "scripts": {
+    "build": "node esbuild.config.mjs production",
+    "dev": "node esbuild.config.mjs",
+    "version": "node -e \"const fs=require('fs');const pkg=require('./package.json');const manifest=require('./manifest.json');manifest.version=pkg.version;fs.writeFileSync('./manifest.json', JSON.stringify(manifest,null,2)+'\\n');\""
+  },
+  "keywords": [
+    "obsidian",
+    "plugin",
+    "stocks",
+    "finance"
+  ],
+  "author": "Shih-Yung Lee",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "builtin-modules": "^4.0.0",
+    "esbuild": "^0.25.3",
+    "obsidian": "latest",
+    "typescript": "^5.8.3"
+  }
+}
