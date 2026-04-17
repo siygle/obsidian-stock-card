@@ -1,12 +1,12 @@
 {
   "name": "obsidian-stock-card",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Obsidian plugin to search stocks and insert stock information cards.",
   "main": "main.js",
   "scripts": {
     "build": "node esbuild.config.mjs production",
     "dev": "node esbuild.config.mjs",
-    "version": "node -e \"const fs=require('fs');const pkg=require('./package.json');const manifest=require('./manifest.json');manifest.version=pkg.version;fs.writeFileSync('./manifest.json', JSON.stringify(manifest,null,2)+'\\n');\""
+    "version": "node -e \"const fs=require('fs');const pkg=require('./package.json');const manifest=require('./manifest.json');const versions=require('./versions.json');manifest.version=pkg.version;versions[pkg.version]=manifest.minAppVersion;fs.writeFileSync('./manifest.json', JSON.stringify(manifest,null,2)+'\\n');fs.writeFileSync('./versions.json', JSON.stringify(versions,null,2)+'\\n');\""
   },
   "keywords": [
     "obsidian",
