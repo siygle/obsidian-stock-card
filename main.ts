@@ -63,6 +63,8 @@ interface StockCardPluginSettings {
   apiBaseUrl: string;
   searchPath: string;
   detailPathTemplate: string;
+  apiKey: string;
+  apiKeyHeaderName: string;
   maxNewsCount: number;
   autoCompleteTrigger: string;
   demoMode: boolean;
@@ -72,6 +74,8 @@ const DEFAULT_SETTINGS: StockCardPluginSettings = {
   apiBaseUrl: "http://localhost:8787",
   searchPath: "/search?q={query}",
   detailPathTemplate: "/stocks/{id}",
+  apiKey: "",
+  apiKeyHeaderName: "x-api-key",
   maxNewsCount: 3,
   autoCompleteTrigger: "@stock ",
   demoMode: true
@@ -244,7 +248,11 @@ class StockDataService {
       this.settings.apiBaseUrl,
       this.settings.searchPath.replace("{query}", encodeURIComponent(trimmed))
     );
-    const response = await requestUrl({ url, method: "GET" });
+    const response = await requestUrl({
+      url,
+      method: "GET",
+      headers: this.buildHeaders()
+    });
     const json = response.json;
 
     if (Array.isArray(json)) {
@@ -270,7 +278,11 @@ class StockDataService {
       this.settings.apiBaseUrl,
       this.settings.detailPathTemplate.replace("{id}", encodeURIComponent(id))
     );
-    const response = await requestUrl({ url, method: "GET" });
+    const response = await requestUrl({
+      url,
+      method: "GET",
+      headers: this.buildHeaders()
+    });
     const detail = response.json as StockDetail;
 
     if (!detail?.symbol || !detail?.name) {
@@ -296,6 +308,16 @@ class StockDataService {
       market: stock.market,
       exchange: stock.exchange
     }));
+  }
+
+  private buildHeaders(): Record<string, string> | undefined {
+    const apiKey = this.settings.apiKey.trim();
+    if (!apiKey) return undefined;
+
+    const headerName = this.settings.apiKeyHeaderName.trim() || DEFAULT_SETTINGS.apiKeyHeaderName;
+    return {
+      [headerName]: apiKey
+    };
   }
 }
 
@@ -440,6 +462,32 @@ class StockInfoCardSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("API key")
+      .setDesc("選填。若 API 需要驗證，會在每次請求自動帶上指定 header。")
+      .addText((text) =>
+        text
+          .setPlaceholder("sk-...")
+          .setValue(this.plugin.settings.apiKey)
+          .onChange(async (value) => {
+            this.plugin.settings.apiKey = value.trim();
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("API key header name")
+      .setDesc("選填。預設為 x-api-key，也可改成 Authorization 等自訂 header 名稱。")
+      .addText((text) =>
+        text
+          .setPlaceholder("x-api-key")
+          .setValue(this.plugin.settings.apiKeyHeaderName)
+          .onChange(async (value) => {
+            this.plugin.settings.apiKeyHeaderName = value.trim() || DEFAULT_SETTINGS.apiKeyHeaderName;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
       .setName("Max news count")
       .setDesc("插入資訊卡時最多保留幾則新聞")
       .addText((text) =>
@@ -467,7 +515,7 @@ class StockInfoCardSettingTab extends PluginSettingTab {
 
     containerEl.createEl("h3", { text: "API 回傳格式" });
     containerEl.createEl("p", {
-      text: "Search API 可回傳陣列或 { items: [...] }；Detail API 需回傳 symbol、name、price、news、references 等欄位。"
+      text: "Search API 可回傳陣列或 { items: [...] }；Detail API 需回傳 symbol、name、price、news、references 等欄位。若有填 API key，請求也會自動附帶你設定的 header。"
     });
   }
 }
